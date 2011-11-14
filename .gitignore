@@ -1,0 +1,4 @@
+vcsversion.egg-info
+MANIFEST
+*.pyc
+.vcsversion
