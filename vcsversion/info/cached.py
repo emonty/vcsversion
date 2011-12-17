@@ -14,20 +14,25 @@
 #  License for the specific language governing permissions and limitations
 #  under the License.
 
-import vcsversion
-import optparse
+import version
+import commands
+import json
 
 
-def run():
-    base_version = None
-    usage = "vcsversion [OPTIONS] ... [BASE_VERSION]"
-    parser = optparse.OptionParser(usage=usage)
+class cached(version.version_info):
 
-    (options, args) = parser.parse_args()
-    if len(args) > 0:
-        base_version = args[0]
-    version_info = vcsversion.get_version_info(base_version)
-    print version_info.get_branch_nick(), version_info.get_tarball_version()
+    def __init__(self, base):
+        with open(".vcsversion", "r") as versioninfo:
+            _versions = json.load(versioninfo)
 
-if __name__ == "__main__":
-    run()
+        self.revno = _versions['revno']
+        self.revision_id = _versions['revision_id']
+        self.revindex = _versions['revindex']
+        self.branch_nick = _versions['branch_nick']
+        self.base_version = _versions['base_version']
+        self.final = _versions['final']
+        self.before = _versions['before']
+
+    @staticmethod
+    def write_vcsversion():
+        pass

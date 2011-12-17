@@ -14,8 +14,9 @@
 #  License for the specific language governing permissions and limitations
 #  under the License.
 
-import versions
+import version
 import commands
+
 
 def _get_current_tag():
     stat, out = commands.getstatusoutput("bzr tags -r-1")
@@ -24,9 +25,12 @@ def _get_current_tag():
     else:
         return out.strip().split()[0]
 
-def _get_bzr_base_version():
+
+def _get_bzr_latest_tag():
     tag_info = []
     stat, out = commands.getstatusoutput("bzr tags --sort=time")
+    if out.strip() != "":
+        return None
     for tag in out.split("\n"):
         tag = tag.strip()
         tag_name, tag_revno = tag.split()
@@ -34,9 +38,18 @@ def _get_bzr_base_version():
             tag_info.append(tag_name)
     return tag_info[-1]
 
+
+def _get_bzr_base_version():
+    base_version = _get_bzr_latest_tag()
+    if base_version is None:
+        base_version = "0.0"
+    return base_version
+
+
 def _get_bzr_branch():
     stat, out = commands.getstatusoutput("bzr nick")
     return out.strip()
+
 
 def _get_bzr_revision_id():
     cmd = "bzr log -r-1 --show-ids"
@@ -45,11 +58,31 @@ def _get_bzr_revision_id():
         if line.startswith("revision-id"):
             return line.split()[1]
 
-def _get_bzr_revno():
-    stat, out = commands.getstatusoutput("bzr revno")
-    return out.strip()
 
-class bzr_versions(versions.versions):
+def _get_bzr_full_revno(before):
+    stat, out = commands.getstatusoutput("bzr revno")
+    return int(out.strip())
+
+
+def _get_bzr_revno(before):
+    if before:
+        # Prefix versioning wants the total number
+        return _get_bzr_full_revno()
+    else:
+        latest_tag = _get_bzr_latest_tag()
+        if latest_tag is None:
+            return _get_bzr_full_revno()
+        else:
+            cmd = "bzr log --line -r tag:%s.." % latest_tag
+            stat, out = commands.getstatusoutput(cmd)
+            if stat != 0:
+                # probably a tag in the history on a sub-rev
+                return _get_bzr_full_revno()
+            log_lines = out.split("\n")
+            return len(log_lines) - 1
+
+
+class bzr(version.version_info):
 
     def __init__(self, base_version=None):
         self.current_tag = _get_current_tag()
@@ -71,5 +104,4 @@ class bzr_versions(versions.versions):
         # final gets set if the version we're on is tagged
         self.branch_nick = _get_bzr_branch()
         self.revision_id = _get_bzr_revision_id()
-        self.revno = _get_bzr_revno()
-
+        self.revno = _get_bzr_revno(self.before)

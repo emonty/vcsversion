@@ -18,9 +18,9 @@
 from setuptools import setup
 from setuptools import find_packages
 
-from vcsversion import build_version
+from vcsversion import build
 
-build_version.setup(
+build.setup(
     name='vcsversion',
     description="Library for managing version information from VCS",
     license='Apache License (2.0)',

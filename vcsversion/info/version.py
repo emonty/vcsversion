@@ -17,7 +17,8 @@
 import json
 import os
 
-class versions(object):
+
+class version_info(object):
 
     def __init__(self, base_version, before=False, final=False,
                  branch_nick=None, revision_id=None, revno=None):
@@ -60,14 +61,17 @@ class versions(object):
         return self.revision_id
 
     def get_tarball_version(self):
+        if self.final:
+            return self.get_base_version()
         if self.before:
             from datetime import date
             datestamp = date.strftime(date.today(), "%Y%m%d")
-            format_str = "%(base_version)s~%(date)s.%(branch_nick)s%(revno)s"
+            format_str = "%(base_version)s~%(date)s%(revno)0.5d%(revid)s"
             return format_str % dict(branch_nick=self.get_branch_nick(),
                                      revno=self.get_revno(),
                                      base_version=self.get_base_version(),
-                                     date=datestamp)
+                                     date=datestamp,
+                                     revid=self.get_revision_id())
         else:
             datestamp = None
             return "%s.%s" % (self.get_base_version(),
@@ -84,7 +88,7 @@ class versions(object):
 
     def write_vcsversion(self):
         try:
-            with open('.vcsversion','w') as versionfile:
+            with open('.vcsversion', 'w') as versionfile:
                 versionfile.write(json.dumps(self.get_version_dict()))
         except:
             os.remove('.vcsversion')
