@@ -14,7 +14,7 @@
 #  License for the specific language governing permissions and limitations
 #  under the License.
 
-import vcsversion
+import vcsversion.build
 import optparse
 
 
@@ -26,7 +26,7 @@ def run():
     (options, args) = parser.parse_args()
     if len(args) > 0:
         base_version = args[0]
-    version_info = vcsversion.get_version_info(base_version)
+    version_info = vcsversion.build.get_version_info(base_version)
     print version_info.get_branch_nick(), version_info.get_tarball_version()
 
 if __name__ == "__main__":

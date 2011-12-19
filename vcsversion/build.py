@@ -20,8 +20,6 @@ import commands
 import setuptools
 from setuptools.command.sdist import sdist
 
-import versions
-
 
 def get_version_info(base=None):
     """ factory method which detects and returns the proper driver class """

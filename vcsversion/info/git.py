@@ -92,7 +92,7 @@ def _get_git_revindex(tag):
     return len(log_lines)
 
 
-class git_versions(version.version_info):
+class git(version.version_info):
 
     def __init__(self, base_version=None):
         self.current_tag = _get_current_tag()
