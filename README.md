@@ -16,7 +16,7 @@ report the version back.
 
 For information about contributing, visit the project homepage at:
 
-  https://launchpad.net/git-review
+  https://launchpad.net/vcsversion
 
 For the latest released code, please see PyPI. To get the latest development
 source code, please see github at:
